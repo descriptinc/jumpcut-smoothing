@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jumpcut Smoothing — Invisible Cuts for Talking-Head Video</title>
+  <meta name="description" content="Jumpcut Smoothing regenerates a short bridge of frames across a cut so the edit point flows naturally instead of snapping. A companion to Video Regenerate from Descript." />
+  <link rel="icon" type="image/png" sizes="96x96" href="https://static-cdn.descript.com/web/icons/favicon-96x96.png" />
+  <link rel="icon" type="image/svg+xml" href="https://static-cdn.descript.com/web/icons/favicon.svg" />
+  <link rel="shortcut icon" href="https://static-cdn.descript.com/web/icons/favicon.ico" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <div class="hero__inner">
+      <h1 class="hero__title">Jumpcut Smoothing</h1>
+      <p class="hero__tagline">Making cuts disappear by <em>regenerating the frames across them</em></p>
+      <div class="authors">
+        <span>Matthew Bendel</span>
+        <span>Xingzhe He</span>
+        <span>Stephen W. Bailey</span>
+        <span>Mithilesh Vaidya</span>
+        <span>Sumukh Badam</span>
+        <span>Geoffry Berlin</span>
+        <span>Keith Simmons</span>
+        <span>Vicki Anand</span>
+        <span>Jose Sotelo</span>
+      </div>
+      <p class="affiliations">Descript, Inc.</p>
+    </div>
+
+    <p class="hero__sub">
+      Cut a video and the picture jumps: trimming or re-timing a clip drops frames, and the head
+      snaps to a new position. Jumpcut Smoothing fills that gap with regenerated frames so the join
+      flows like a continuous take. Play both versions below and watch the boundary.
+    </p>
+  </section>
+
+  <!-- THE PROBLEM -->
+  <section class="section" id="problem">
+    <div class="section__head">
+      <h2>The problem</h2>
+    </div>
+    <div class="prose">
+      <p>
+        Editing the audio almost always changes its <em>length</em>. A re-recorded or trimmed line
+        can run longer or shorter than the footage it replaces, and to keep picture and sound
+        aligned, frames get removed or repeated. Dropping frames leaves a <strong>jumpcut</strong>:
+        a hard break where the head suddenly snaps to a new position and the motion stutters.
+      </p>
+      <p>
+        It's the kind of thing you don't consciously register but always feel — the moment a clip
+        stops looking like a continuous take.
+      </p>
+    </div>
+
+    <!-- side-by-side comparison (wired from MEDIA.jumpcut in main.js) -->
+    <div class="jc-compare" id="jc-compare">
+      <div class="jc-picker" role="tablist" aria-label="Jumpcut example"></div>
+
+      <div class="jc-pair">
+        <figure class="jc-item">
+          <figcaption class="jc-item__label">
+            <span class="jc-dot jc-dot--raw"></span> Hard cut
+            <span class="jc-item__sub">no jumpcut smoothing</span>
+          </figcaption>
+          <div class="video-tile video-tile--jc jc-mode-raw" data-jc="raw">
+            <video class="video-tile__video" playsinline preload="metadata" muted>
+              <source data-srcref="" type="video/mp4" />
+            </video>
+            <div class="video-tile__placeholder" aria-hidden="true">
+              <div class="ph-face ph-face--jc"><span class="ph-face__head"></span><span class="ph-face__mouth"></span></div>
+              <p>Hard cut</p>
+            </div>
+            <button class="video-tile__play" type="button" aria-label="Play comparison">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+            </button>
+            <div class="scrubber"><div class="scrubber__track">
+              <div class="scrubber__regions"></div>
+              <div class="scrubber__progress"></div>
+            </div></div>
+            <span class="region-badge">cut boundary</span>
+          </div>
+        </figure>
+
+        <figure class="jc-item">
+          <figcaption class="jc-item__label">
+            <span class="jc-dot jc-dot--smooth"></span> With smoothing
+            <span class="jc-item__sub">regenerated bridge</span>
+          </figcaption>
+          <div class="video-tile video-tile--jc jc-mode-smooth" data-jc="smooth">
+            <video class="video-tile__video" playsinline preload="metadata" muted>
+              <source data-srcref="" type="video/mp4" />
+            </video>
+            <div class="video-tile__placeholder" aria-hidden="true">
+              <div class="ph-face"><span class="ph-face__head"></span><span class="ph-face__mouth"></span></div>
+              <p>With smoothing</p>
+            </div>
+            <button class="video-tile__play" type="button" aria-label="Play comparison">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+            </button>
+            <div class="scrubber"><div class="scrubber__track">
+              <div class="scrubber__regions"></div>
+              <div class="scrubber__progress"></div>
+            </div></div>
+            <span class="region-badge">regenerated bridge</span>
+          </div>
+        </figure>
+      </div>
+
+      <div class="transcript" data-jc-transcript hidden></div>
+
+      <p class="jc-note">
+        Both clips play in sync. On the left, frames are dropped to hit the new timing, so the
+        head snaps and the motion stutters at the boundary. On the right, a regenerated bridge
+        spans the same boundary and the cut disappears.
+      </p>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how">
+    <div class="section__head">
+      <h2>How it works</h2>
+    </div>
+    <div class="prose">
+      <p>
+        We treat the cut as an inpainting problem in time. Given the frames before and after the
+        break, a video model fills in a short <strong>bridge</strong> that connects them, carrying
+        head pose, expression, and motion over from both sides. Instead of jumping, the head moves
+        through the gap the way it would have on camera.
+      </p>
+      <p>
+        Because the bridge is generated from the surrounding footage, it inherits the same
+        identity, lighting, and background — there's no separate clip to match, and nothing to
+        line up by hand. The same approach covers the two common cases: shortening a clip (where a
+        span of frames is removed) and looping a short clip to fill time (where the loop point
+        would otherwise be obvious).
+      </p>
+      <p>
+        Bridging the head motion is only half of it. The mouth still has to say the right thing
+        across the join, so we <strong>always run Video Regenerate over the bridge to correct the
+        lip-sync</strong> — re-syncing the lips to the audio on the generated frames. The result is
+        seamless in both motion and speech.
+      </p>
+    </div>
+
+    <!-- diagram: frames in with a fully-masked gap -> generator -> bridged frames out -->
+    <figure class="pipeline jc-pipeline" aria-label="Frames around a cut, with the intermediate frames fully masked, are passed to the generator, which fills the gap to produce a seamless sequence.">
+      <div class="pipeline__stage pipeline__stage--frames">
+        <div class="jc-strip">
+          <span class="jcf"></span>
+          <span class="jcf"></span>
+          <span class="jcf jcf--mask"></span>
+          <span class="jcf jcf--mask"></span>
+          <span class="jcf jcf--mask"></span>
+          <span class="jcf"></span>
+          <span class="jcf"></span>
+        </div>
+        <span class="pipeline__cap">Frames in<br><small>context + fully-masked gap</small></span>
+      </div>
+      <div class="pipeline__arrow">→</div>
+      <div class="pipeline__stage pipeline__stage--model">
+        <div class="pipeline__model"><span>Generator</span></div>
+        <span class="pipeline__cap">Video infill</span>
+      </div>
+      <div class="pipeline__arrow">→</div>
+      <div class="pipeline__stage pipeline__stage--frames">
+        <div class="jc-strip">
+          <span class="jcf"></span>
+          <span class="jcf"></span>
+          <span class="jcf jcf--gen"></span>
+          <span class="jcf jcf--gen"></span>
+          <span class="jcf jcf--gen"></span>
+          <span class="jcf"></span>
+          <span class="jcf"></span>
+        </div>
+        <span class="pipeline__cap">Frames out<br><small>seamless bridge</small></span>
+      </div>
+    </figure>
+
+    <aside class="paper-callout">
+      <p class="paper-callout__tag">Lip-sync correction</p>
+      <p class="paper-callout__title">The bridge is re-synced with Video&nbsp;Regenerate</p>
+      <p class="paper-callout__body">
+        Every bridge we generate is passed through <strong>Video Regenerate</strong>, our lip-sync
+        model, so the mouth matches the audio on the new frames — not just the head pose. The cut
+        disappears and the speech stays in sync.
+      </p>
+      <div class="paper-callout__links">
+        <a class="btn btn--sm" href="https://descriptinc.github.io/video-regenerate/">Video Regenerate →</a>
+      </div>
+    </aside>
+  </section>
+
+  <!-- CITATION -->
+  <section class="section section--cite" id="citation">
+    <div class="section__head">
+      <h2>Citation</h2>
+    </div>
+    <p class="prose">If you reference this work, please cite:</p>
+    <div class="cite-block">
+      <button class="cite-copy" type="button" id="cite-copy">Copy</button>
+      <pre id="cite-text">@misc{bendel2026jumpcutsmoothing,
+  title         = {Jumpcut Smoothing: Hiding Cuts in Talking-Head Video by Generative Frame Infill},
+  author        = {Matthew Bendel and Xingzhe He and Stephen W. Bailey and
+                   Mithilesh Vaidya and Sumukh Badam and Geoffry Berlin and
+                   Keith Simmons and Vicki Anand and Jose Sotelo},
+  year          = {2026},
+  howpublished  = {Descript, Inc.},
+  url           = {https://www.descript.com}
+}</pre>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Descript, Inc. · Jumpcut Smoothing</p>
+    <p class="footer__muted">
+      © 2026 Descript, Inc. ·
+      <a href="https://descriptinc.github.io/video-regenerate/">Video Regenerate</a> ·
+      <a href="#top">Back to top ↑</a>
+    </p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

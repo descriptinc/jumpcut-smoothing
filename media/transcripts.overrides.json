@@ -1,0 +1,15 @@
+{
+  "_comment": "Transcripts for the jumpcut comparison clips, keyed by the 'with smoothing' filename. Markers: [+regenerated bridge words+]. 'edits' are [startSec, endSec] spans where the bridge sits.",
+  "henry_regen_1.mp4": {
+    "transcript": "it does have an impact on a human being because you didn't have [+a normal young life. It's not the same.+] What you're exposed to right from the start is very difficult to deal with.",
+    "edits": [[4.1, 6.9]]
+  },
+  "jacky_chen_regen_1.mp4": {
+    "transcript": "Last, not least, a million thanks to all my friends, fans around the world, because you, [+I continue making movies for kicking+] and punching, keep breaking my bones. Thank you so much. Thank you, Oscar!",
+    "edits": [[7.6, 9.4]]
+  },
+  "diary_regen_1.mp4": {
+    "transcript": "friend in the in our team here is French [+and he was with us in Paris when we first met.+] And he said, if you go to Claire Fontaine, your chance of becoming a professional footballer is like 95%.",
+    "edits": [[2.2, 4.1]]
+  }
+}
