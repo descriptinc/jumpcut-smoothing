@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jumpcut Smoothing — Invisible Cuts for Talking-Head Video</title>
+  <title>Jumpcut Smoothing: Invisible Cuts for Talking-Head Video</title>
   <meta name="description" content="Jumpcut Smoothing regenerates a short bridge of frames across a cut so the edit point flows naturally instead of snapping. A companion to Video Regenerate from Descript." />
   <link rel="icon" type="image/png" sizes="96x96" href="https://static-cdn.descript.com/web/icons/favicon-96x96.png" />
   <link rel="icon" type="image/svg+xml" href="https://static-cdn.descript.com/web/icons/favicon.svg" />
@@ -50,7 +50,7 @@
         a hard break where the head suddenly snaps to a new position and the motion stutters.
       </p>
       <p>
-        It's the kind of thing you don't consciously register but always feel — the moment a clip
+        It's the kind of thing you don't consciously register but always feel: the moment a clip
         stops looking like a continuous take.
       </p>
     </div>
@@ -133,7 +133,7 @@
       </p>
       <p>
         Because the bridge is generated from the surrounding footage, it inherits the same
-        identity, lighting, and background — there's no separate clip to match, and nothing to
+        identity, lighting, and background, so there's no separate clip to match and nothing to
         line up by hand. The same approach covers the two common cases: shortening a clip (where a
         span of frames is removed) and looping a short clip to fill time (where the loop point
         would otherwise be obvious).
@@ -141,7 +141,7 @@
       <p>
         Bridging the head motion is only half of it. The mouth still has to say the right thing
         across the join, so we <strong>always run Video Regenerate over the bridge to correct the
-        lip-sync</strong> — re-syncing the lips to the audio on the generated frames. The result is
+        lip-sync</strong>, re-syncing the lips to the audio on the generated frames. The result is
         seamless in both motion and speech.
       </p>
     </div>
@@ -185,7 +185,7 @@
       <p class="paper-callout__title">The bridge is re-synced with Video&nbsp;Regenerate</p>
       <p class="paper-callout__body">
         Every bridge we generate is passed through <strong>Video Regenerate</strong>, our lip-sync
-        model, so the mouth matches the audio on the new frames — not just the head pose. The cut
+        model, so the mouth matches the audio on the new frames, not just the head pose. The cut
         disappears and the speech stays in sync.
       </p>
       <div class="paper-callout__links">
