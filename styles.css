@@ -385,7 +385,7 @@ strong { font-weight: 600; }
   border: 1.5px solid color-mix(in srgb, var(--edit-maroon) 45%, transparent);
   background: color-mix(in srgb, var(--edit-maroon) 8%, transparent);
 }
-.jcf::before { content: ""; position: absolute; left: 50%; top: 28%; transform: translateX(-50%); width: 6px; height: 6px; border-radius: 50%; background: color-mix(in srgb, var(--edit-maroon) 45%, transparent); }
+.jcf::before { content: ""; position: absolute; top: 30%; left: 37%; width: 3.5px; height: 3.5px; border-radius: 50%; background: color-mix(in srgb, var(--edit-maroon) 45%, transparent); box-shadow: 6px 0 0 color-mix(in srgb, var(--edit-maroon) 45%, transparent); }
 .jcf::after { content: ""; position: absolute; left: 50%; bottom: 22%; transform: translateX(-50%); width: 9px; height: 3px; border-radius: 3px; background: color-mix(in srgb, var(--edit-maroon) 45%, transparent); }
 .jcf--mask { border-color: var(--rec-red); background: var(--rec-red); animation: pulseMask 1.6s ease-in-out infinite; }
 .jcf--mask::before, .jcf--mask::after { display: none; }

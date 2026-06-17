@@ -42,6 +42,10 @@
   var REGISTRY = [];
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Videos are served from the GCS bucket.
+  var MEDIA_BASE = "https://storage.googleapis.com/lyrebird-research-web-demos/jumpcut-smoothing/";
+  function mediaUrl(p) { return MEDIA_BASE + String(p).replace(/^media\//, ""); }
+
   /* --------------------------------------------------------------- */
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -105,6 +109,7 @@
    * ------------------------------------------------------------- */
   function loadTileSource(tile, src) {
     if (!src) return;
+    src = mediaUrl(src);
     var video = tile.querySelector(".video-tile__video");
     var source = video.querySelector("source");
     var probe = document.createElement("video");
