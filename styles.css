@@ -217,6 +217,23 @@ strong { font-weight: 600; }
 .video-tile__mute svg { width: 18px; height: 18px; }
 .video-tile__mute.is-muted { color: var(--light-peach); }
 
+/* fullscreen toggle (sits left of the mute button) */
+.video-tile__fs {
+  position: absolute; top: 12px; right: 54px; z-index: 7;
+  width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+  background: rgba(17, 10, 13, 0.55); color: #fff; display: none; place-items: center;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  transition: background 0.2s, opacity 0.2s;
+}
+.video-tile.has-video .video-tile__fs { display: grid; }
+.video-tile__fs:hover { background: rgba(17, 10, 13, 0.82); }
+.video-tile__fs svg { width: 18px; height: 18px; }
+/* in fullscreen, let the video fill the screen and center it */
+.video-tile:fullscreen { display: flex; align-items: center; justify-content: center; background: #000; }
+.video-tile:fullscreen .video-tile__video { width: 100%; height: 100%; object-fit: contain; }
+.video-tile:-webkit-full-screen { background: #000; }
+.video-tile:-webkit-full-screen .video-tile__video { width: 100%; height: 100%; object-fit: contain; }
+
 /* scrubber */
 .scrubber {
   position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 5;
@@ -298,11 +315,17 @@ strong { font-weight: 600; }
   background: var(--light-peach); color: var(--rec-red-dk); padding: 0 3px;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--rec-red) 30%, transparent);
 }
-/* changed / removed words — struck through in the original line */
+/* unified diff: removed words struck through, hidden until the edit is revealed */
 .transcript .seg.del {
   text-decoration: line-through; text-decoration-color: var(--peach);
   text-decoration-thickness: 2px; color: var(--ink-faint);
 }
+.transcript__row--diff .seg.del,
+.transcript__row--diff .seg--gap { display: none; }
+.is-revealed .transcript__row--diff .seg.del,
+.transcript--on .transcript__row--diff .seg.del,
+.is-revealed .transcript__row--diff .seg--gap,
+.transcript--on .transcript__row--diff .seg--gap { display: inline; }
 
 /* ---------- SECTIONS ---------- */
 .section {
@@ -317,6 +340,7 @@ strong { font-weight: 600; }
   border-bottom: 2px solid var(--accent); display: inline-block;
 }
 .prose { max-width: var(--maxw-narrow); }
+.prose--wide { max-width: none; }
 .prose p { margin: 0 0 18px; color: var(--ink-soft); }
 .prose strong { color: var(--ink); }
 .prose--lead { font-size: clamp(19px, 2.4vw, 22px); color: var(--ink); margin-bottom: 32px; }

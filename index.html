@@ -30,6 +30,34 @@
       <p class="affiliations">Descript, Inc.</p>
     </div>
 
+    <div class="hero-duo">
+      <figure class="spotlight" id="hero-jcs">
+        <p class="spotlight__kicker">Jumpcut smoothing</p>
+        <div class="spotlight__frame">
+          <div class="video-tile">
+            <video class="video-tile__video" playsinline preload="metadata">
+              <source data-srcref="media/jcs.mp4" type="video/mp4" />
+            </video>
+            <div class="video-tile__placeholder" aria-hidden="true">
+              <div class="ph-face ph-face--jc"><span class="ph-face__head"></span><span class="ph-face__mouth"></span></div>
+              <p>Talking-head clip</p>
+            </div>
+            <button class="video-tile__play" type="button" aria-label="Play clip">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+            </button>
+            <div class="scrubber"><div class="scrubber__track">
+              <div class="scrubber__regions"></div>
+              <div class="scrubber__progress"></div>
+            </div></div>
+          </div>
+        </div>
+        <figcaption class="spotlight__caption">
+          <span>Watch the cut disappear</span>
+          <span class="spotlight__hint">regenerated bridge</span>
+        </figcaption>
+      </figure>
+    </div>
+
     <p class="hero__sub">
       Cut a video and the picture jumps: trimming or re-timing a clip drops frames, and the head
       snaps to a new position. Jumpcut Smoothing fills that gap with regenerated frames so the join
@@ -124,7 +152,7 @@
     <div class="section__head">
       <h2>How it works</h2>
     </div>
-    <div class="prose">
+    <div class="prose prose--wide">
       <p>
         We treat the cut as an inpainting problem in time. Given the frames before and after the
         break, a video model fills in a short <strong>bridge</strong> that connects them, carrying

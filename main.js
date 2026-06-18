@@ -159,6 +159,7 @@
       video.addEventListener("ended", function () { tile.classList.remove("is-playing"); });
 
       addMuteToggle(tile, video);
+      addFullscreenToggle(tile, video);
       bindSeek(tile, function (t) { video.currentTime = t; });
     }
 
@@ -181,6 +182,32 @@
     '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4.03v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06a9 9 0 0 0 0-17.54z"/></svg>';
   var ICON_VOL_OFF =
     '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm18.29-.71L19.88 6.88 17 9.76l-2.88-2.88-1.41 1.41L15.59 11l-2.88 2.88 1.41 1.41L17 12.41l2.88 2.88 1.41-1.41L18.41 11l2.88-2.71z"/></svg>';
+  var ICON_FS =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
+
+  // Add a fullscreen toggle. Uses the standard API with iOS/Safari fallbacks.
+  function addFullscreenToggle(tile, video) {
+    if (!video) return;
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "video-tile__fs";
+    btn.setAttribute("aria-label", "Fullscreen");
+    btn.innerHTML = ICON_FS;
+    tile.appendChild(btn);
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var doc = document;
+      var isFs = doc.fullscreenElement || doc.webkitFullscreenElement;
+      if (isFs) {
+        (doc.exitFullscreen || doc.webkitExitFullscreen || function () {}).call(doc);
+        return;
+      }
+      var target = tile;
+      if (target.requestFullscreen) { target.requestFullscreen(); }
+      else if (target.webkitRequestFullscreen) { target.webkitRequestFullscreen(); }
+      else if (video.webkitEnterFullscreen) { video.webkitEnterFullscreen(); } // iOS Safari
+    });
+  }
 
   // Add a mute/unmute toggle. Clips play with sound (only one at a time);
   // this lets the viewer silence them.
@@ -220,19 +247,23 @@
    * Renders an "edited" line (new words highlighted on reveal) and an
    * "original" ground-truth line (changed words struck through).
    * ------------------------------------------------------------- */
-  function buildDiffRow(diff, mode) {
+  // Render a single unified diff line: unchanged text stays plain, removed
+  // words show struck-through (only once revealed), inserted words are
+  // highlighted. Before reveal the line reads as the final edited sentence.
+  function buildUnifiedRow(diff) {
     var html = "";
+    var prev = null; // "ins" | "del" | "plain"
     diff.split(/(\[\+[\s\S]*?\+\]|\[-[\s\S]*?-\])/g).forEach(function (tok) {
       if (!tok) return;
       var ins = tok.match(/^\[\+([\s\S]*?)\+\]$/);
       var del = tok.match(/^\[-([\s\S]*?)-\]$/);
-      if (ins) {
-        if (mode === "edited") { html += '<span class="seg ins">' + escapeHtml(ins[1]) + "</span>"; }
-      } else if (del) {
-        if (mode === "original") { html += '<span class="seg del">' + escapeHtml(del[1]) + "</span>"; }
-      } else {
-        html += '<span class="seg">' + escapeHtml(tok) + "</span>";
+      // Keep a space between adjacent del/ins so the diff reads cleanly.
+      if ((ins || del) && (prev === "ins" || prev === "del")) {
+        html += '<span class="seg seg--gap"> </span>';
       }
+      if (ins) { html += '<span class="seg ins">' + escapeHtml(ins[1]) + "</span>"; prev = "ins"; }
+      else if (del) { html += '<span class="seg del">' + escapeHtml(del[1]) + "</span>"; prev = "del"; }
+      else { html += '<span class="seg">' + escapeHtml(tok) + "</span>"; prev = "plain"; }
     });
     return html;
   }
@@ -243,20 +274,12 @@
     if (!diff) { el.hidden = true; el.innerHTML = ""; el.classList.remove("transcript--on"); return; }
     el.hidden = false;
     el.classList.toggle("transcript--on", !!opts.alwaysOn);
-    var editedLabel = opts.editedLabel || "Edited";
-    var html =
-      '<div class="transcript__row transcript__row--edited">' +
-        '<span class="transcript__label">' + editedLabel + "</span>" +
-        '<span class="transcript__text">' + buildDiffRow(diff, "edited") + "</span>" +
+    var label = opts.editedLabel || "Edited";
+    el.innerHTML =
+      '<div class="transcript__row transcript__row--diff">' +
+        '<span class="transcript__label">' + label + "</span>" +
+        '<span class="transcript__text">' + buildUnifiedRow(diff) + "</span>" +
       "</div>";
-    if (opts.showOriginal !== false) {
-      html +=
-        '<div class="transcript__row transcript__row--original">' +
-          '<span class="transcript__label">Original</span>' +
-          '<span class="transcript__text">' + buildDiffRow(diff, "original") + "</span>" +
-        "</div>";
-    }
-    el.innerHTML = html;
   }
 
   /* ---------------------------------------------------------------
@@ -603,8 +626,10 @@
       }
     });
 
-    // Mute toggle on the audible (smooth) clip.
+    // Mute toggle on the audible (smooth) clip; fullscreen on both.
     addMuteToggle(smoothTile, smoothVid);
+    addFullscreenToggle(rawTile, rawVid);
+    addFullscreenToggle(smoothTile, smoothVid);
 
     // Pull transcript/edits from overrides+auto data (keyed by smooth file),
     // falling back to the MEDIA.jumpcut config.
